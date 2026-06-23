@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flappy Emoji - Jeu de Vol Addictif 🐣</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: "Segoe UI Emoji", Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* Animation de fond */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(5deg); }
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    .emoji-float {
+      position: absolute;
+      font-size: 60px;
+      opacity: 0.3;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .hero-section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 40px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+      background-size: 50px 50px;
+      animation: slideIn 1s ease-out;
+    }
+    
+    .hero-title {
+      font-size: 5em;
+      margin-bottom: 20px;
+      background: linear-gradient(45deg, #ff6b6b, #4ec0ca, #ffd700);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      animation: slideIn 0.8s ease-out;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .hero-emoji {
+      font-size: 120px;
+      margin: 30px 0;
+      animation: float 4s ease-in-out infinite, pulse 2s ease-in-out infinite;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+      position: relative;
+      z-index: 1;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.5em;
+      color: rgba(255, 255, 255, 0.95);
+      margin-bottom: 40px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      animation: slideIn 1s ease-out;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .cta-button {
+      background: linear-gradient(45deg, #ff6b6b, #4ec0ca);
+      color: white;
+      border: none;
+      padding: 20px 50px;
+      font-size: 1.5em;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      animation: slideIn 1.2s ease-out, pulse 2s ease-in-out infinite;
+      position: relative;
+      z-index: 1;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .cta-button:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+      background: linear-gradient(45deg, #4ec0ca, #ff6b6b);
+    }
+    
+    .features-section {
+      padding: 80px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .section-title {
+      text-align: center;
+      font-size: 3em;
+      color: white;
+      margin-bottom: 60px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+    
+    .feature-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      animation: slideIn 0.8s ease-out;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .feature-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+    }
+    
+    .feature-title {
+      font-size: 1.5em;
+      color: #2c3e50;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+    
+    .feature-description {
+      color: #666;
+      font-size: 1.1em;
+      line-height: 1.6;
+    }
+    
+    .stats-section {
+      padding: 80px 20px;
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(78, 192, 202, 0.2));
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      text-align: center;
+    }
+    
+    .stat-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .stat-number {
+      font-size: 3em;
+      font-weight: bold;
+      color: #ff6b6b;
+      margin-bottom: 10px;
+    }
+    
+    .stat-label {
+      font-size: 1.2em;
+      color: #666;
+    }
+    
+    .footer {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 40px 20px;
+      text-align: center;
+      color: white;
+    }
+    
+    .footer p {
+      margin: 10px 0;
+      opacity: 0.9;
+    }
+    
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 3em;
+      }
+      
+      .hero-emoji {
+        font-size: 80px;
+      }
+      
+      .hero-subtitle {
+        font-size: 1.2em;
+      }
+      
+      .cta-button {
+        padding: 15px 40px;
+        font-size: 1.2em;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="emoji-float" style="top: 10%; left: 10%; animation-delay: 0s;">🐣</div>
+    <div class="emoji-float" style="top: 20%; right: 15%; animation-delay: 1s;">😁</div>
+    <div class="emoji-float" style="bottom: 30%; left: 20%; animation-delay: 2s;">🎮</div>
+    <div class="emoji-float" style="bottom: 15%; right: 10%; animation-delay: 3s;">⭐</div>
+    
+    <h1 class="hero-title">Flappy Emoji</h1>
+    <div class="hero-emoji">🐣</div>
+    <p class="hero-subtitle">Le jeu de vol le plus addictif et personnalisable !</p>
+    <a href="menu.html" class="cta-button">🚀 Jouer Maintenant</a>
+  </section>
+  
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="container">
+      <h2 class="section-title">✨ Fonctionnalités</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🎭</div>
+          <h3 class="feature-title">Emojis Personnalisables</h3>
+          <p class="feature-description">Choisissez parmi des dizaines d'emojis pour personnaliser votre expérience de jeu !</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🎨</div>
+          <h3 class="feature-title">Skins Uniques</h3>
+          <p class="feature-description">Personnalisez les tuyaux, arrière-plans et sols avec des skins exclusifs débloquables !</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">💎</div>
+          <h3 class="feature-title">Système de Diamants</h3>
+          <p class="feature-description">Gagnez des diamants en jouant et achetez des skins rares dans la boutique !</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🎡</div>
+          <h3 class="feature-title">Roue de Chance</h3>
+          <p class="feature-description">Tournez la roue quotidienne pour gagner des diamants gratuitement !</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🎁</div>
+          <h3 class="feature-title">Bonus Puissants</h3>
+          <p class="feature-description">Achetez des bonus comme des points de départ ou des vies supplémentaires !</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🏅</div>
+          <h3 class="feature-title">Système de Ligue</h3>
+          <p class="feature-description">Grimpez dans les ligues en améliorant votre meilleur score !</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <div class="container">
+      <h2 class="section-title">📊 Statistiques</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">20</div>
+          <div class="stat-label">Ligues</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">50+</div>
+          <div class="stat-label">Emojis</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">30+</div>
+          <div class="stat-label">Skins</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">∞</div>
+          <div class="stat-label">Fun</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <p>🎮 Flappy Emoji - Le meilleur jeu de vol emoji</p>
+    <p>Créé avec ❤️ pour votre divertissement</p>
+    <p style="margin-top: 20px;">
+      <a href="menu.html" style="color: white; text-decoration: underline;">Commencer à jouer →</a>
+    </p>
+  </footer>
+  
+  <script>
+    // Animation au scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.animation = 'slideIn 0.8s ease-out';
+        }
+      });
+    }, observerOptions);
+    
+    document.querySelectorAll('.feature-card, .stat-card').forEach(card => {
+      observer.observe(card);
+    });
+  </script>
+</body>
+</html>
+

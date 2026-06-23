@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pass Emoji - Flappy Emoji 🎯</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: "Segoe UI Emoji", Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .pass-container {
+      background: linear-gradient(145deg, #ffffff, #f8f9fa);
+      border-radius: 25px;
+      padding: 30px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .pass-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4, #FFEAA7, #DDA0DD, #98D8C8, #F7DC6F, #BB8FCE, #85C1E9);
+    }
+    
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: linear-gradient(45deg, #6c757d, #495057);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .back-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+    }
+    
+    .pass-header {
+      text-align: center;
+      margin-bottom: 30px;
+      margin-top: 20px;
+    }
+    
+    .pass-title {
+      font-size: 2.5em;
+      font-weight: bold;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+    
+    .pass-subtitle {
+      font-size: 1.2em;
+      color: #666;
+      margin-bottom: 20px;
+    }
+    
+    .score-info {
+      background: linear-gradient(145deg, #fff3e0, #ffe0b2);
+      padding: 15px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      border: 2px solid #ff9800;
+      text-align: center;
+    }
+    
+    .score-info h3 {
+      color: #e65100;
+      margin-bottom: 5px;
+    }
+    
+    .score-info p {
+      color: #bf360c;
+      font-weight: 600;
+    }
+    
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .emoji-tier {
+      background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+      border: 3px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .emoji-tier::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #4CAF50, #2196F3);
+    }
+    
+    .emoji-tier.unlocked {
+      background: linear-gradient(145deg, #d4edda, #c3e6cb);
+      border-color: #28a745;
+      transform: scale(1.02);
+      box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+    }
+    
+    .emoji-tier.locked {
+      background: linear-gradient(145deg, #f8d7da, #f5c6cb);
+      border-color: #dc3545;
+      opacity: 0.7;
+    }
+    
+    .emoji-tier.unlocked::before {
+      background: linear-gradient(90deg, #28a745, #20c997);
+    }
+    
+    .emoji-tier.locked::before {
+      background: linear-gradient(90deg, #dc3545, #e74c3c);
+    }
+    
+    .tier-number {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #495057;
+    }
+    
+    .emoji-display {
+      font-size: 4em;
+      margin: 15px 0;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    }
+    
+    .emoji-tier.locked .emoji-display {
+      filter: grayscale(100%) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    }
+    
+    .score-requirement {
+      font-size: 1.1em;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .emoji-tier.unlocked .score-requirement {
+      color: #28a745;
+    }
+    
+    .emoji-tier.locked .score-requirement {
+      color: #dc3545;
+    }
+    
+    .emoji-name {
+      font-size: 1em;
+      color: #6c757d;
+      font-weight: 500;
+    }
+    
+    .emoji-tier.unlocked .emoji-name {
+      color: #155724;
+    }
+    
+    .emoji-tier.locked .emoji-name {
+      color: #721c24;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e9ecef;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 15px;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4CAF50, #45a049);
+      border-radius: 10px;
+      transition: width 0.5s ease;
+    }
+    
+    .emoji-tier.locked .progress-fill {
+      background: linear-gradient(90deg, #dc3545, #c82333);
+    }
+    
+    .stats-section {
+      background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+      padding: 20px;
+      border-radius: 15px;
+      margin-top: 20px;
+      border: 2px solid #2196f3;
+    }
+    
+    .stats-title {
+      color: #1565c0;
+      font-size: 1.3em;
+      font-weight: bold;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 10px;
+    }
+    
+    .stat-value {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #1565c0;
+    }
+    
+    .stat-label {
+      font-size: 0.9em;
+      color: #1976d2;
+      margin-top: 5px;
+    }
+    
+    @keyframes unlock {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    
+    .emoji-tier.unlocked {
+      animation: unlock 0.6s ease;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    .emoji-tier:hover {
+      animation: pulse 0.5s ease;
+    }
+    
+    @media (max-width: 768px) {
+      .pass-container {
+        padding: 20px;
+        margin: 10px;
+      }
+      
+      .pass-title {
+        font-size: 2em;
+      }
+      
+      .emoji-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+      }
+      
+      .emoji-display {
+        font-size: 3em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="pass-container">
+    <a href="index.html" class="back-btn">← Retour au Menu</a>
+    
+    <div class="pass-header">
+      <h1 class="pass-title">🎯 Pass Emoji</h1>
+      <p class="pass-subtitle">Débloquez des emojis exclusifs en atteignant des scores élevés !</p>
+    </div>
+    
+    <div class="score-info">
+      <h3>📊 Votre Meilleur Score</h3>
+      <p id="bestScoreDisplay">0 points</p>
+    </div>
+    
+    <div class="emoji-grid" id="emojiGrid">
+      <!-- Les emojis seront générés dynamiquement -->
+    </div>
+    
+    <div class="stats-section">
+      <h3 class="stats-title">📈 Statistiques</h3>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value" id="unlockedCount">0</div>
+          <div class="stat-label">Emojis Débloqués</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="totalCount">10</div>
+          <div class="stat-label">Total Emojis</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="progressPercent">0%</div>
+          <div class="stat-label">Progression</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="nextTier">50</div>
+          <div class="stat-label">Prochain Tier</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 🎯 PASS EMOJI - Système de récompenses
+    const emojiPassData = [
+      { emoji: "🤡", name: "Clown", score: 50, tier: 1 },
+      { emoji: "👹", name: "Ogre", score: 100, tier: 2 },
+      { emoji: "👺", name: "Goblin", score: 150, tier: 3 },
+      { emoji: "👻", name: "Fantôme", score: 200, tier: 4 },
+      { emoji: "👽", name: "Alien", score: 250, tier: 5 },
+      { emoji: "👾", name: "Monstre", score: 300, tier: 6 },
+      { emoji: "🤖", name: "Robot", score: 350, tier: 7 },
+      { emoji: "😈", name: "Diable", score: 400, tier: 8 },
+      { emoji: "👿", name: "Démon", score: 450, tier: 9 },
+      { emoji: "💀", name: "Crâne", score: 500, tier: 10 }
+    ];
+    
+    let bestScore = parseInt(localStorage.getItem("bestScore") || "0");
+    let unlockedEmojis = JSON.parse(localStorage.getItem("unlockedEmojis") || "[]");
+    
+    // Fonction pour vérifier si un emoji est débloqué
+    function isEmojiUnlocked(score) {
+      return bestScore >= score;
+    }
+    
+    // Fonction pour mettre à jour l'affichage
+    function updateDisplay() {
+      // Mettre à jour le score affiché
+      document.getElementById("bestScoreDisplay").textContent = `${bestScore} points`;
+      
+      // Générer la grille d'emojis
+      const emojiGrid = document.getElementById("emojiGrid");
+      emojiGrid.innerHTML = "";
+      
+      emojiPassData.forEach((emojiData, index) => {
+        const isUnlocked = isEmojiUnlocked(emojiData.score);
+        const tierElement = document.createElement("div");
+        tierElement.className = `emoji-tier ${isUnlocked ? 'unlocked' : 'locked'}`;
+        
+        // Calculer le pourcentage de progression
+        const progressPercent = Math.min((bestScore / emojiData.score) * 100, 100);
+        
+        tierElement.innerHTML = `
+          <div class="tier-number">Tier ${emojiData.tier}</div>
+          <div class="emoji-display">${emojiData.emoji}</div>
+          <div class="score-requirement">${emojiData.score} points</div>
+          <div class="emoji-name">${emojiData.name}</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${progressPercent}%"></div>
+          </div>
+        `;
+        
+        emojiGrid.appendChild(tierElement);
+      });
+      
+      // Mettre à jour les statistiques
+      updateStats();
+    }
+    
+    // Fonction pour mettre à jour les statistiques
+    function updateStats() {
+      const unlockedCount = emojiPassData.filter(emoji => isEmojiUnlocked(emoji.score)).length;
+      const totalCount = emojiPassData.length;
+      const progressPercent = Math.round((unlockedCount / totalCount) * 100);
+      
+      // Trouver le prochain tier à débloquer
+      const nextTier = emojiPassData.find(emoji => !isEmojiUnlocked(emoji.score));
+      const nextTierScore = nextTier ? nextTier.score : "Max";
+      
+      document.getElementById("unlockedCount").textContent = unlockedCount;
+      document.getElementById("totalCount").textContent = totalCount;
+      document.getElementById("progressPercent").textContent = `${progressPercent}%`;
+      document.getElementById("nextTier").textContent = nextTierScore;
+    }
+    
+    // Fonction pour vérifier les nouveaux déblocages
+    function checkNewUnlocks() {
+      emojiPassData.forEach(emojiData => {
+        if (isEmojiUnlocked(emojiData.score) && !unlockedEmojis.includes(emojiData.emoji)) {
+          unlockedEmojis.push(emojiData.emoji);
+          localStorage.setItem("unlockedEmojis", JSON.stringify(unlockedEmojis));
+          
+          // Ajouter l'emoji à la liste des emojis du jeu
+          addEmojiToGame(emojiData);
+          
+          // Afficher une notification de déblocage
+          showUnlockNotification(emojiData);
+        }
+      });
+    }
+    
+    // Fonction pour ajouter l'emoji au système de jeu
+    function addEmojiToGame(emojiData) {
+      // Charger la liste des emojis existante
+      const existingEmojis = JSON.parse(localStorage.getItem("emojiList") || "[]");
+      
+      // Vérifier si l'emoji n'est pas déjà dans la liste
+      const emojiExists = existingEmojis.some(emoji => emoji.emoji === emojiData.emoji);
+      
+      if (!emojiExists) {
+        // Ajouter l'emoji à la liste avec un score requis basé sur le tier
+        const newEmoji = {
+          emoji: emojiData.emoji,
+          minScore: emojiData.score,
+          isShop: false,
+          isPassEmoji: true,
+          passTier: emojiData.tier
+        };
+        
+        existingEmojis.push(newEmoji);
+        localStorage.setItem("emojiList", JSON.stringify(existingEmojis));
+      }
+    }
+    
+    // Fonction pour afficher une notification de déblocage
+    function showUnlockNotification(emojiData) {
+      // Créer une notification temporaire
+      const notification = document.createElement("div");
+      notification.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(145deg, #d4edda, #c3e6cb);
+        border: 3px solid #28a745;
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        z-index: 10000;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        animation: slideIn 0.5s ease;
+      `;
+      
+      notification.innerHTML = `
+        <div style="font-size: 3em; margin-bottom: 15px;">${emojiData.emoji}</div>
+        <h3 style="color: #155724; margin-bottom: 10px;">Nouvel Emoji Débloqué !</h3>
+        <p style="color: #155724; font-weight: 600;">${emojiData.name}</p>
+        <p style="color: #155724; font-size: 0.9em; margin-top: 5px;">Tier ${emojiData.tier} - ${emojiData.score} points</p>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Supprimer la notification après 3 secondes
+      setTimeout(() => {
+        notification.style.animation = "slideOut 0.5s ease";
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 500);
+      }, 3000);
+    }
+    
+    // Ajouter les animations CSS pour les notifications
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes slideIn {
+        0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+        100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      }
+      @keyframes slideOut {
+        0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        100% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Initialiser l'affichage
+    updateDisplay();
+    checkNewUnlocks();
+    
+    // Écouter les changements de score (si on revient du jeu)
+    window.addEventListener("focus", () => {
+      const newBestScore = parseInt(localStorage.getItem("bestScore") || "0");
+      if (newBestScore !== bestScore) {
+        bestScore = newBestScore;
+        updateDisplay();
+        checkNewUnlocks();
+      }
+    });
+  </script>
+</body>
+</html>
